@@ -21,12 +21,7 @@ func (c *MainController) Get() {
 }
 
 func (c *UploadController) Get() {
-	c.Data["Website"] = "beego.me"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.Data["Device1"] = "鸿蒙"
-	c.Data["Device2"] = "欧拉"
-	c.Data["Device3"] = "伏羲"
-	devices := []string{"鸿蒙", "欧拉", "伏羲"}
+	devices := QueryDeviceInfo()
 	c.Data["devices"] = devices
 	c.TplName = "upload.tpl"
 }
