@@ -38,7 +38,15 @@
 <body style="width:100%;height:100%;text-align:center;">
 <div style="width:60%;height:30%;text-align:center;">
     <form enctype="multipart/form-data" method="post">
-        <input id="file"  class="file" type="file" name="uploadname" data-msg-placeholder="选择文件" />
+
+        <select name="device" required="required">
+            {{range .devices}}
+                <option value={{.}}>{{.}}</option>
+            {{end}}
+        </select>
+
+        <input type="text" name="version" required="required">
+        <input id="file" class="file" type="file" name="uploadname" data-msg-placeholder="选择文件"/>
     </form>
 </div>
 </body>
