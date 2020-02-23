@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"log"
+	"fmt"
 )
 
 type MainController struct {
@@ -27,18 +28,12 @@ func (c *UploadController) Get() {
 
 
 func (c *UploadController) Post() {
-	// 读取文件信息
-	f, h, err := c.GetFile("filename")
-
+	f, h, err := c.GetFile("uploadname")
+	fmt.Println(f,h,err)
 	if err != nil {
-		log.Fatal("读取文件错误", err)
+		log.Fatal("getfile err ", err)
 	}
-
-	// 延迟关闭文件
 	defer f.Close()
-
-	// 保存文件, 本地文件路径static/upload/上传文件名
-	// 需要提前创建好static/upload目录
-	c.SaveToFile("filename", "F://Storage/" + h.Filename)
+	c.SaveToFile("uploadname", "F://Storage/" + h.Filename)
+	c.Ctx.WriteString("ok")
 }
-

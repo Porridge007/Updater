@@ -37,10 +37,9 @@
 
 <body style="width:100%;height:100%;text-align:center;">
 <div style="width:60%;height:30%;text-align:center;">
-    <form action='#' method="post" enctype="multipart/form-data">
-        <input id="file" name="file" type="file" class="file" data-msg-placeholder="选择文件">
+    <form enctype="multipart/form-data" method="post">
+        <input id="file"  class="file" type="file" name="uploadname" data-msg-placeholder="选择文件" />
     </form>
 </div>
 </body>
-
 </html>
