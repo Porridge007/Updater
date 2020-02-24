@@ -5,6 +5,7 @@ import (
 	"sort"
 )
 
+
 // FileMeta: File meta information structure
 type FileMeta struct {
 	FileSha1 string
