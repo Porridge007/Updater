@@ -63,6 +63,7 @@ func GetLastFileMetas(count int) []FileMeta {
 	return fMetaArray[0:count]
 }
 
+
 func RemoveFileMeta(fileSha1 string) {
 	delete(fileMetas, fileSha1)
 }
