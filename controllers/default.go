@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"Updater/models"
 	"Updater/util"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"io"
 	"os"
-	"time"
 )
 
 type FileMeta struct {
@@ -39,9 +40,6 @@ func (c *UploadController) Get() {
 
 func (c *UploadController) Post() {
 	f, h, err := c.GetFile("uploadname")
-	fmt.Println(c.GetString("device"))
-	fmt.Println(c.GetString("version"))
-	fmt.Println(f, h, err)
 	defer f.Close()
 
 	// 保存文件操作 equal c.Ctx.SavetoFile
@@ -51,37 +49,38 @@ func (c *UploadController) Post() {
 	defer openFile.Close()
 	io.Copy(openFile, file)
 
-	//// 生成Sha1值
-	//buf := bytes.NewBuffer(nil)
-	//io.Copy(buf,file)
-	//fmt.Println(util.Sha1(buf.Bytes()))
-	//c.Ctx.WriteString("ok")
-
 	if err != nil {
 		fmt.Println("Failed to get data, err:", err.Error())
 		return
 	}
 	defer file.Close()
-	fileMeta := FileMeta{
-		FileName: head.Filename,
-		Location: "F://Storage/" + head.Filename,
-		UploadAt: time.Now().Format("2006-01-02 15:04:05"),
+	fileInfo := models.File{
+		File_name:head.Filename,
+		File_addr: "F://Storage/" + head.Filename,
+		Device:c.GetString("device"),
+		Version:c.GetString("version"),
 	}
 
-	newFile, err := os.Create(fileMeta.Location)
+	newFile, err := os.Create(fileInfo.File_addr)
 	if err != nil {
 		fmt.Println("Failed to create file, err:", err.Error())
 		return
 	}
 	defer newFile.Close()
-	fileMeta.FileSize, err = io.Copy(newFile, file)
+
+	fileInfo.File_size, err = io.Copy(newFile, file)
 	if err != nil {
 		fmt.Println("Failed to save data into file, err:", err.Error())
 		return
 	}
 	newFile.Seek(0, 0)
-	fileMeta.FileSha1 = util.FileSha1(newFile)
-	fmt.Println(fileMeta)
+	fileInfo.File_sha1 = util.FileSha1(newFile)
+
+	o := orm.NewOrm()
+	id, err := o.Insert(&fileInfo)
+	if err != nil{
+		fmt.Println(id)
+	}
 
 	c.Ctx.WriteString("ok")
 }
