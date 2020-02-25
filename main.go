@@ -27,4 +27,3 @@ func init() {
 func main() {
 	beego.Run()
 }
-

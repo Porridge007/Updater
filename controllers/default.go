@@ -26,6 +26,10 @@ type UploadController struct {
 	beego.Controller
 }
 
+type DownloadController struct {
+	beego.Controller
+}
+
 func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -55,10 +59,10 @@ func (c *UploadController) Post() {
 	}
 	defer file.Close()
 	fileInfo := models.File{
-		File_name:head.Filename,
+		File_name: head.Filename,
 		File_addr: "F://Storage/" + head.Filename,
-		Device:c.GetString("device"),
-		Version:c.GetString("version"),
+		Device:    c.GetString("device"),
+		Version:   c.GetString("version"),
 	}
 
 	newFile, err := os.Create(fileInfo.File_addr)
@@ -78,9 +82,42 @@ func (c *UploadController) Post() {
 
 	o := orm.NewOrm()
 	id, err := o.Insert(&fileInfo)
-	if err != nil{
+	if err != nil {
 		fmt.Println(id)
+		c.Ctx.WriteString("The file has been upload")
+		return
 	}
 
 	c.Ctx.WriteString("ok")
+}
+
+//func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+//	r.ParseForm()
+//	fsha1 := r.Form.Get("filehash")
+//	fm := meta.GetFileMeta(fsha1)
+//	f, err := os.Open(fm.Location)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		return
+//	}
+//	defer f.Close()
+//
+//	data, err := ioutil.ReadAll(f)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		return
+//	}
+//	w.Header().Set("Content-Type", "application/octect-stream")
+//	w.Header().Set("Content-Disposition", "attachment;filename=\""+fm.FileName+"\"")
+//	w.Write(data)
+//}
+
+func (c *DownloadController) Post() {
+	fsha1 := c.GetString("filehash")
+	o := orm.NewOrm()
+	qs := o.QueryTable("file")
+
+	fmt.Println(qs.Filter("file_sha1", fsha1))
+	c.Ctx.WriteString("victory")
+
 }

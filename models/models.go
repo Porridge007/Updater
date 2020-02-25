@@ -6,7 +6,7 @@ import (
 
 type File struct{
 	Id int64
-	File_sha1 string
+	File_sha1 string `orm:"unique"`
 	File_name string
 	File_size int64
 	File_addr string
