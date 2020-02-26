@@ -5,6 +5,7 @@ import (
 	"Updater/util"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"io"
 	"os"
@@ -43,21 +44,9 @@ func (c *UploadController) Get() {
 }
 
 func (c *UploadController) Post() {
-	f, h, err := c.GetFile("uploadname")
-	defer f.Close()
-
-	// 保存文件操作 equal c.Ctx.SavetoFile
-	file, head, err := c.Ctx.Request.FormFile("uploadname")
+	file, head, err := c.GetFile("uploadname")
 	defer file.Close()
-	openFile, err := os.OpenFile("F://Storage/"+h.Filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	defer openFile.Close()
-	io.Copy(openFile, file)
 
-	if err != nil {
-		fmt.Println("Failed to get data, err:", err.Error())
-		return
-	}
-	defer file.Close()
 	fileInfo := models.File{
 		File_name: head.Filename,
 		File_addr: "F://Storage/" + head.Filename,
@@ -83,7 +72,7 @@ func (c *UploadController) Post() {
 	o := orm.NewOrm()
 	id, err := o.Insert(&fileInfo)
 	if err != nil {
-		fmt.Println(id)
+		logs.Error(id,err.Error())
 		c.Ctx.WriteString("The file has been upload")
 		return
 	}
@@ -117,7 +106,11 @@ func (c *DownloadController) Post() {
 	o := orm.NewOrm()
 	qs := o.QueryTable("file")
 
-	fmt.Println(qs.Filter("file_sha1", fsha1))
+	var maps []orm.Params
+	fmt.Println(qs.Filter("file_sha1", fsha1).Values(&maps))
+	for _, m := range maps {
+		fmt.Println(m["file_name"], m["file_addr"])
+	}
 	c.Ctx.WriteString("victory")
 
 }
