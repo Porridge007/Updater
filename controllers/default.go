@@ -8,16 +8,10 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 )
-
-type FileMeta struct {
-	FileSha1 string
-	FileName string
-	FileSize int64
-	Location string
-	UploadAt string
-}
 
 type MainController struct {
 	beego.Controller
@@ -80,37 +74,41 @@ func (c *UploadController) Post() {
 	c.Ctx.WriteString("ok")
 }
 
-//func DownloadHandler(w http.ResponseWriter, r *http.Request) {
-//	r.ParseForm()
-//	fsha1 := r.Form.Get("filehash")
-//	fm := meta.GetFileMeta(fsha1)
-//	f, err := os.Open(fm.Location)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		return
-//	}
-//	defer f.Close()
-//
-//	data, err := ioutil.ReadAll(f)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		return
-//	}
-//	w.Header().Set("Content-Type", "application/octect-stream")
-//	w.Header().Set("Content-Disposition", "attachment;filename=\""+fm.FileName+"\"")
-//	w.Write(data)
-//}
 
 func (c *DownloadController) Post() {
 	fsha1 := c.GetString("filehash")
-	o := orm.NewOrm()
-	qs := o.QueryTable("file")
 
-	var maps []orm.Params
-	fmt.Println(qs.Filter("file_sha1", fsha1).Values(&maps))
-	for _, m := range maps {
-		fmt.Println(m["file_name"], m["file_addr"])
+	o := orm.NewOrm()
+	fileMeta := models.File{Id:20}
+	err := o.QueryTable("file").Filter("file_sha1",fsha1).One(&fileMeta)
+
+	//var user User
+	//err := o.QueryTable("user").Filter("name", "slene").One(&user)
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		fmt.Printf("Returned Multi Rows Not One")
 	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		fmt.Printf("Not row found")
+	}
+	f, err := os.Open(fileMeta.File_addr)
+
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/octect-stream")
+	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
+	c.Ctx.ResponseWriter.Write(data)
+
 	c.Ctx.WriteString("victory")
 
 }
