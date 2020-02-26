@@ -117,11 +117,40 @@ func (c *DownloadController) Post() {
 
 func (c *UpdateLatestController) Get() {
 	device := c.GetString("device")
-	version := c.GetString("version")
+	o := orm.NewOrm()
+	fileMeta := models.File{Device:device}
 
+	err := o.QueryTable("file").OrderBy("-created").One(&fileMeta)
+	if err != nil{
+		return
+	}
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		fmt.Printf("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		fmt.Printf("Not row found")
+	}
 
+	f, err := os.Open(fileMeta.File_addr)
 
-	fmt.Println(device,version)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/octect-stream")
+	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
+	c.Ctx.ResponseWriter.Write(data)
 
 	c.Ctx.WriteString("victory")
 }
+
+
