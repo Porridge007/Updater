@@ -9,4 +9,5 @@ func init() {
     beego.Router("/", &controllers.MainController{})
     beego.Router("/upload",&controllers.UploadController{})
 	beego.Router("/download",&controllers.DownloadController{})
+	beego.Router("/update_latest",&controllers.UpdateLatestController{})
 }

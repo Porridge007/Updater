@@ -25,6 +25,10 @@ type DownloadController struct {
 	beego.Controller
 }
 
+type UpdateLatestController struct {
+	beego.Controller
+}
+
 func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -79,11 +83,9 @@ func (c *DownloadController) Post() {
 	fsha1 := c.GetString("filehash")
 
 	o := orm.NewOrm()
-	fileMeta := models.File{Id:20}
+	fileMeta := models.File{File_sha1:fsha1}
 	err := o.QueryTable("file").Filter("file_sha1",fsha1).One(&fileMeta)
 
-	//var user User
-	//err := o.QueryTable("user").Filter("name", "slene").One(&user)
 	if err == orm.ErrMultiRows {
 		// 多条的时候报错
 		fmt.Printf("Returned Multi Rows Not One")
@@ -111,4 +113,15 @@ func (c *DownloadController) Post() {
 
 	c.Ctx.WriteString("victory")
 
+}
+
+func (c *UpdateLatestController) Get() {
+	device := c.GetString("device")
+	version := c.GetString("version")
+
+
+
+	fmt.Println(device,version)
+
+	c.Ctx.WriteString("victory")
 }
