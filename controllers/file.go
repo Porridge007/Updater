@@ -29,6 +29,10 @@ type UpdateLatestController struct {
 	beego.Controller
 }
 
+type UpdateGivenController struct {
+	beego.Controller
+}
+
 func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -153,4 +157,41 @@ func (c *UpdateLatestController) Get() {
 	c.Ctx.WriteString("victory")
 }
 
+func (c *UpdateGivenController) Post()  {
+	device := c.GetString("device")
+	version := c.GetString("version")
+	o := orm.NewOrm()
+	fileMeta := models.File{Device:device, Version:version}
+	err := o.QueryTable("file").Filter("device", device).Filter("version", version).One(&fileMeta)
+	if err != nil{
+		return
+	}
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		fmt.Printf("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		fmt.Printf("Not row found")
+	}
+
+	f, err := os.Open(fileMeta.File_addr)
+
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/octect-stream")
+	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
+	c.Ctx.ResponseWriter.Write(data)
+
+	c.Ctx.WriteString("victory")
+}
 
