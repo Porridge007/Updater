@@ -23,5 +23,5 @@ type User struct {
 	UserPwd string
 	Email string `orm:"null"`
 	Phone string `orm:"null"`
-	SignUpAt string `orm:"null"`
+	SignUpAt string `orm:"auto_now_add;type(datetime)"`
 }
