@@ -16,3 +16,12 @@ type File struct{
 	Device string
 	Version string
 }
+
+type User struct {
+	Id int64
+	UserName string `orm:"unique"`
+	UserPwd string
+	Email string `orm:"null"`
+	Phone string `orm:"null"`
+	SignUpAt string `orm:"null"`
+}
