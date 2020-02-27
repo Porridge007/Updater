@@ -11,6 +11,10 @@ type UserSignUpController struct {
 	beego.Controller
 }
 
+type UserSignInController struct {
+	beego.Controller
+}
+
 func (c *UserSignUpController) Get() {
 	c.TplName = "signup.tpl"
 }
@@ -31,4 +35,8 @@ func (c *UserSignUpController) Post() {
 		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
 	}
 	c.Ctx.ResponseWriter.Write([]byte("SUCCESS"))
+}
+
+func (c *UserSignInController) Get() {
+	c.TplName = "signin.tpl"
 }

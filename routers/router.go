@@ -12,4 +12,5 @@ func init() {
 	beego.Router("/update_latest",&controllers.UpdateLatestController{})
     beego.Router("/update_given", &controllers.UpdateGivenController{})
     beego.Router("/user/signup",&controllers.UserSignUpController{})
+	beego.Router("/user/signin",&controllers.UserSignInController{})
 }

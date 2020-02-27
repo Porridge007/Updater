@@ -25,3 +25,8 @@ type User struct {
 	Phone string `orm:"null"`
 	SignUpAt string `orm:"auto_now_add;type(datetime)"`
 }
+
+type UserToken struct {
+	UserName string `orm:"pk"`
+	Token string
+}
