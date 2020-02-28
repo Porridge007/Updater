@@ -2,9 +2,14 @@ package controllers
 
 import (
 	"Updater/models"
+	"Updater/util"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+)
+
+const (
+	pwdSalt = "*#1989"
 )
 
 type UserSignUpController struct {
@@ -23,9 +28,16 @@ func (c *UserSignUpController) Post() {
 	username := c.GetString("username")
 	userpwd := c.GetString("password")
 
+	if len(username) < 3 || len(userpwd) < 5 {
+		c.Ctx.ResponseWriter.Write([]byte("Invalid parameter"))
+		return
+	}
+
+	encPasswd := util.Sha1([]byte(userpwd + pwdSalt))
+
 	user := models.User{
 		UserName: username,
-		UserPwd:  userpwd,
+		UserPwd:  encPasswd,
 	}
 
 	o := orm.NewOrm()
@@ -40,3 +52,14 @@ func (c *UserSignUpController) Post() {
 func (c *UserSignInController) Get() {
 	c.TplName = "signin.tpl"
 }
+
+//func (c *UserSignInController) Post() {
+//	userName := c.GetString("username")
+//	password := c.GetString("password")
+//
+//
+//
+//	encPasswd := util.Sha1([]byte(password + pwdSalt))
+//}
+
+
