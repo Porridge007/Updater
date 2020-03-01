@@ -45,6 +45,7 @@ func (c *UserSignUpController) Post() {
 	o := orm.NewOrm()
 	id, err := o.Insert(&user)
 	if err != nil {
+		fmt.Println(213)
 		fmt.Println(id, err.Error())
 		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
 	}
@@ -66,11 +67,12 @@ func (c *UserSignInController) Post() {
 	o := orm.NewOrm()
 
 	count, err := o.QueryTable("User").Filter("UserName", userName).Filter("UserPwd", encPasswd).Count()
+	fmt.Println(count)
 	if count <= 0 ||err != nil {
-		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
+		c.Ctx.ResponseWriter.Write([]byte("1231"))
 		return
 	}
-	fmt.Println(count)
+	fmt.Println(count,12)
 	c.Ctx.ResponseWriter.Write([]byte("SUCCESS"))
 
 	token := GenToken(userName)
@@ -79,25 +81,12 @@ func (c *UserSignInController) Post() {
 	_,err = o.Raw("replace into user_token set user_name = ?, token = ?", userName, token).Exec()
 	fmt.Println()
 	if err != nil {
-		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
+		fmt.Println(11122)
+		c.Ctx.ResponseWriter.Write([]byte("FAILED2"))
+		fmt.Println(232323)
 		return
 	}
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
-
-	resp := util.RespMsg{
-		Code: 0,
-		Msg:  "OK",
-		Data: struct {
-			Location string
-			Username string
-			Token    string
-		}{
-			Location: "http://" + c.Ctx.Request.Host + "/static/view/home.html",
-			Username: userName,
-			Token:    token,
-		},
-	}
-	c.Ctx.ResponseWriter.Write(resp.JSONBytes())
 }
 
 

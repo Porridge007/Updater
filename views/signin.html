@@ -63,14 +63,13 @@
                 console.log(data)
                 if (data == 'SUCCESS') {
                     // 成功后跳到登录页
-                    document.getElementById("login_hint").style.display = "block";
                     setTimeout(() => {
                         window.location.href = '/user/signin';
                     }, 2000);
 
                 } else {
-                    console.log(data)
-                    alert('登陆失败');
+                    console.log(111,data)
+                    alert('登陆失败1');
                 }
             }
         });
