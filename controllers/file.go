@@ -127,7 +127,7 @@ func  (c *ListController) Get(){
 	c.TplName = "list.html"
 }
 
-func (c *UpdateLatestController) Get() {
+func (c *UpdateLatestController) Post() {
 	device := c.GetString("device")
 	o := orm.NewOrm()
 	fileMeta := models.File{Device:device}
@@ -168,6 +168,7 @@ func (c *UpdateLatestController) Get() {
 func (c *UpdateGivenController) Post()  {
 	device := c.GetString("device")
 	version := c.GetString("version")
+	fmt.Println(device,version)
 	o := orm.NewOrm()
 	fileMeta := models.File{Device:device, Version:version}
 	err := o.QueryTable("file").Filter("device", device).Filter("version", version).One(&fileMeta)
