@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"Updater/common"
 	"Updater/util"
 	"net/http"
-	"Updater/common"
 )
 
 func HTTPInterceptor(h http.HandlerFunc) http.HandlerFunc {

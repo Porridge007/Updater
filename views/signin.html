@@ -64,12 +64,12 @@
                 if (data == 'SUCCESS') {
                     // 成功后跳到登录页
                     setTimeout(() => {
-                        window.location.href = '/user/signin';
+                        window.location.href = '/file/list';
                     }, 2000);
 
                 } else {
                     console.log(111,data)
-                    alert('登陆失败1');
+                    alert('登陆失败');
                 }
             }
         });

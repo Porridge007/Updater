@@ -107,15 +107,10 @@ func IsTokenValid(token string) bool {
 		return false
 	}
 	// 从数据库表tbl_user_token查询username对应的token信息
-	var tokenDb string
-	err := mydb.DBConn().QueryRow("select user_token from tbl_user_token").Scan(&tokenDb)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	//  对比两个token是否一致
-	if token != tokenDb {
+	o := orm.NewOrm()
+	if !o.QueryTable("user_token").Filter("token", token).Exist(){
 		return false
 	}
+
 	return true
 }
