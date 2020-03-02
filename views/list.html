@@ -69,7 +69,7 @@
     window.onload = function () {
         var username = document.getElementById('username');
         $.ajax({
-            url: "/user/info?" + queryParams(),
+            url: "/file/list",
             type: "POST",
             error: function (err) {
                 alert(err);

@@ -3,6 +3,7 @@ package controllers
 import (
 	"Updater/models"
 	"Updater/util"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -126,6 +127,25 @@ func (c *DownloadController) Post() {
 func  (c *ListController) Get(){
 	c.TplName = "list.html"
 }
+
+func  (c *ListController) Post(){
+	limitCnt, _ := c.GetInt64("limit")
+    // todo: user file
+    o := orm.NewOrm()
+    var files []*models.File
+    o.QueryTable("file").Limit(limitCnt).All(&files)
+	fmt.Println(files)
+    data, err := json.Marshal(files)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	c.Ctx.ResponseWriter.Write(data)
+
+
+	c.Ctx.WriteString("ok")
+}
+
 
 func (c *UpdateLatestController) Post() {
 	device := c.GetString("device")
