@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -68,33 +69,53 @@ func (c *UserSignInController) Post() {
 
 	count, err := o.QueryTable("User").Filter("UserName", userName).Filter("UserPwd", encPasswd).Count()
 	fmt.Println(count)
-	if count <= 0 ||err != nil {
+	if count <= 0 || err != nil {
 		c.Ctx.ResponseWriter.Write([]byte("1231"))
 		return
 	}
-	fmt.Println(count,12)
+	fmt.Println(count, 12)
 	c.Ctx.ResponseWriter.Write([]byte("SUCCESS"))
 
 	token := GenToken(userName)
 	fmt.Println(token)
 	// "replace into tbl_user_token (`user_name`,`user_token`) values (?,?)")
-	_,err = o.Raw("replace into user_token set user_name = ?, token = ?", userName, token).Exec()
+	_, err = o.Raw("replace into user_token set user_name = ?, token = ?", userName, token).Exec()
 	fmt.Println()
 	if err != nil {
-		fmt.Println(11122)
 		c.Ctx.ResponseWriter.Write([]byte("FAILED2"))
-		fmt.Println(232323)
 		return
 	}
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 }
-
-
-
 
 func GenToken(username string) string {
 	// 40位字符:md5(username+timestamp+token_salt)+timestamp[:8]
 	ts := fmt.Sprintf("%x", time.Now().Unix())
 	tokenPrefix := util.MD5([]byte(username + ts + "_tokensalt"))
 	return tokenPrefix + ts[:8]
+}
+
+func IsTokenValid(token string) bool {
+	if len(token) != 40 {
+		return false
+	}
+	//  判断token的时效性，是否过期
+	tsNow := time.Now().Unix()
+	tokenTime, _ := strconv.ParseInt(token[31:], 16, 64)
+	if tsNow-tokenTime > 86400 {
+		fmt.Println(tsNow - tokenTime)
+		return false
+	}
+	// 从数据库表tbl_user_token查询username对应的token信息
+	var tokenDb string
+	err := mydb.DBConn().QueryRow("select user_token from tbl_user_token").Scan(&tokenDb)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//  对比两个token是否一致
+	if token != tokenDb {
+		return false
+	}
+	return true
 }
