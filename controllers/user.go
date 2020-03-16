@@ -70,7 +70,7 @@ func (c *UserSignInController) Post() {
 	count, err := o.QueryTable("User").Filter("UserName", userName).Filter("UserPwd", encPasswd).Count()
 	fmt.Println(count)
 	if count <= 0 || err != nil {
-		c.Ctx.ResponseWriter.Write([]byte("1231"))
+		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
 		return
 	}
 	fmt.Println(count, 12)
