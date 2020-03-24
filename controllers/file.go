@@ -84,7 +84,7 @@ func (c *UploadController) Post() {
 		return
 	}
 
-	c.Ctx.WriteString("ok")
+	c.TplName = "list.html"
 }
 
 
