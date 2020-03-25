@@ -152,7 +152,7 @@ func (c *UpdateLatestController) Post() {
 	o := orm.NewOrm()
 	fileMeta := models.File{Device:device}
 
-	err := o.QueryTable("file").OrderBy("-created").One(&fileMeta)
+	err := o.QueryTable("file").Filter("device", device).OrderBy("-created").One(&fileMeta)
 	if err != nil{
 		return
 	}
