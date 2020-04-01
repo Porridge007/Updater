@@ -38,6 +38,10 @@ type ListController struct {
 	beego.Controller
 }
 
+type QueryLatestController struct {
+	beego.Controller
+}
+
 func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -144,6 +148,29 @@ func  (c *ListController) Post(){
 
 
 	c.Ctx.WriteString("ok")
+}
+
+func (c *QueryLatestController) Get() {
+	device := c.GetString("device")
+	o := orm.NewOrm()
+	fileMeta := models.File{Device:device}
+
+	err := o.QueryTable("file").Filter("device", device).OrderBy("-created").One(&fileMeta)
+	if err != nil{
+		return
+	}
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		fmt.Printf("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		fmt.Printf("Not row found")
+	}
+	versionInfo := make(map[string]string)
+	versionInfo["version"]= fileMeta.Version
+	versionJsonStr,_ := json.Marshal(versionInfo)
+	c.Ctx.ResponseWriter.Write(versionJsonStr)
 }
 
 
