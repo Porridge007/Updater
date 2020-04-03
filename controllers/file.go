@@ -65,6 +65,8 @@ func (c *UploadController) Post() {
 		Version:   c.GetString("version"),
 	}
 
+
+	fmt.Println(fileInfo.Device)
 	newFile, err := os.Create(fileInfo.File_addr)
 	if err != nil {
 		fmt.Println("Failed to create file, err:", err.Error())
@@ -79,6 +81,7 @@ func (c *UploadController) Post() {
 	}
 	newFile.Seek(0, 0)
 	fileInfo.File_sha1 = util.FileSha1(newFile)
+
 
 	o := orm.NewOrm()
 	id, err := o.Insert(&fileInfo)
@@ -167,10 +170,8 @@ func (c *QueryLatestController) Get() {
 		// 没有找到记录
 		fmt.Printf("Not row found")
 	}
-	versionInfo := make(map[string]string)
-	versionInfo["version"]= fileMeta.Version
-	versionJsonStr,_ := json.Marshal(versionInfo)
-	c.Ctx.ResponseWriter.Write(versionJsonStr)
+
+	c.Ctx.ResponseWriter.Write([]byte(fileMeta.Version))
 }
 
 
