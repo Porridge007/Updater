@@ -127,7 +127,7 @@ func (c *DownloadController) Post() {
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
 
-	c.Ctx.WriteString("victory")
+	c.TplName = "list.html"
 
 }
 
@@ -150,7 +150,7 @@ func  (c *ListController) Post(){
 	c.Ctx.ResponseWriter.Write(data)
 
 
-	c.Ctx.WriteString("ok")
+	c.TplName = "list.html"
 }
 
 func (c *QueryLatestController) Get() {
@@ -210,7 +210,7 @@ func (c *UpdateLatestController) Post() {
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
 
-	c.Ctx.WriteString("victory")
+	c.TplName = "list.html"
 }
 
 func (c *UpdateGivenController) Post()  {
@@ -249,6 +249,6 @@ func (c *UpdateGivenController) Post()  {
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
 
-	c.Ctx.WriteString("victory")
+	c.TplName = "list.html"
 }
 
