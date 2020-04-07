@@ -25,6 +25,7 @@ type UserSignInController struct {
 
 func (c *UserSignUpController) Get() {
 	c.TplName = "signup.tpl"
+	_ = c.Render()
 }
 
 func (c *UserSignUpController) Post() {
@@ -55,6 +56,7 @@ func (c *UserSignUpController) Post() {
 
 func (c *UserSignInController) Get() {
 	c.TplName = "signin.html"
+	_ = c.Render()
 }
 
 func (c *UserSignInController) Post() {

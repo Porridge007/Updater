@@ -46,12 +46,14 @@ func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
 	c.TplName = "index.tpl"
+	_ = c.Render()
 }
 
 func (c *UploadController) Get() {
 	devices := QueryDeviceInfo()
 	c.Data["devices"] = devices
 	c.TplName = "upload.tpl"
+	_ = c.Render()
 }
 
 func (c *UploadController) Post() {
@@ -64,7 +66,6 @@ func (c *UploadController) Post() {
 		Device:    c.GetString("device"),
 		Version:   c.GetString("version"),
 	}
-
 
 	fmt.Println(fileInfo.Device)
 	newFile, err := os.Create(fileInfo.File_addr)
@@ -82,25 +83,24 @@ func (c *UploadController) Post() {
 	newFile.Seek(0, 0)
 	fileInfo.File_sha1 = util.FileSha1(newFile)
 
-
 	o := orm.NewOrm()
 	id, err := o.Insert(&fileInfo)
 	if err != nil {
-		logs.Error(id,err.Error())
+		logs.Error(id, err.Error())
 		c.Ctx.WriteString("The file has been upload")
 		return
 	}
 
 	c.TplName = "list.html"
+	_ = c.Render()
 }
-
 
 func (c *DownloadController) Post() {
 	fsha1 := c.GetString("filehash")
 
 	o := orm.NewOrm()
-	fileMeta := models.File{File_sha1:fsha1}
-	err := o.QueryTable("file").Filter("file_sha1",fsha1).One(&fileMeta)
+	fileMeta := models.File{File_sha1: fsha1}
+	err := o.QueryTable("file").Filter("file_sha1", fsha1).One(&fileMeta)
 
 	if err == orm.ErrMultiRows {
 		// 多条的时候报错
@@ -128,38 +128,39 @@ func (c *DownloadController) Post() {
 	c.Ctx.ResponseWriter.Write(data)
 
 	c.TplName = "list.html"
-
+	_ = c.Render()
 }
 
-func  (c *ListController) Get(){
+func (c *ListController) Get() {
 	c.TplName = "list.html"
+	_ = c.Render()
 }
 
-func  (c *ListController) Post(){
+func (c *ListController) Post() {
 	limitCnt, _ := c.GetInt64("limit")
-    // todo: user file
-    o := orm.NewOrm()
-    var files []*models.File
-    o.QueryTable("file").Limit(limitCnt).All(&files)
+	// todo: user file
+	o := orm.NewOrm()
+	var files []*models.File
+	o.QueryTable("file").Limit(limitCnt).All(&files)
 	fmt.Println(files)
-    data, err := json.Marshal(files)
+	data, err := json.Marshal(files)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	c.Ctx.ResponseWriter.Write(data)
 
-
 	c.TplName = "list.html"
+	_ = c.Render()
 }
 
 func (c *QueryLatestController) Get() {
 	device := c.GetString("device")
 	o := orm.NewOrm()
-	fileMeta := models.File{Device:device}
+	fileMeta := models.File{Device: device}
 
 	err := o.QueryTable("file").Filter("device", device).OrderBy("-created").One(&fileMeta)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	if err == orm.ErrMultiRows {
@@ -172,16 +173,16 @@ func (c *QueryLatestController) Get() {
 	}
 
 	c.Ctx.ResponseWriter.Write([]byte(fileMeta.Version))
-}
 
+}
 
 func (c *UpdateLatestController) Post() {
 	device := c.GetString("device")
 	o := orm.NewOrm()
-	fileMeta := models.File{Device:device}
+	fileMeta := models.File{Device: device}
 
 	err := o.QueryTable("file").Filter("device", device).OrderBy("-created").One(&fileMeta)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	if err == orm.ErrMultiRows {
@@ -211,16 +212,17 @@ func (c *UpdateLatestController) Post() {
 	c.Ctx.ResponseWriter.Write(data)
 
 	c.TplName = "list.html"
+	_ = c.Render()
 }
 
-func (c *UpdateGivenController) Post()  {
+func (c *UpdateGivenController) Post() {
 	device := c.GetString("device")
 	version := c.GetString("version")
-	fmt.Println(device,version)
+	fmt.Println(device, version)
 	o := orm.NewOrm()
-	fileMeta := models.File{Device:device, Version:version}
+	fileMeta := models.File{Device: device, Version: version}
 	err := o.QueryTable("file").Filter("device", device).Filter("version", version).One(&fileMeta)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	if err == orm.ErrMultiRows {
@@ -250,5 +252,5 @@ func (c *UpdateGivenController) Post()  {
 	c.Ctx.ResponseWriter.Write(data)
 
 	c.TplName = "list.html"
+	_ = c.Render()
 }
-
