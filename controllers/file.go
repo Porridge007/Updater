@@ -42,6 +42,13 @@ type QueryLatestController struct {
 	beego.Controller
 }
 
+type QueryLatestPathController struct {
+	beego.Controller
+}
+
+
+var static_server = "192.168.1.111:8081/storage/"
+
 func (c *MainController) Get() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -149,9 +156,6 @@ func (c *ListController) Post() {
 		return
 	}
 	c.Ctx.ResponseWriter.Write(data)
-
-	c.TplName = "list.html"
-	_ = c.Render()
 }
 
 func (c *QueryLatestController) Get() {
@@ -210,9 +214,6 @@ func (c *UpdateLatestController) Post() {
 	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/octect-stream")
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
-
-	c.TplName = "list.html"
-	_ = c.Render()
 }
 
 func (c *UpdateGivenController) Post() {
@@ -250,7 +251,41 @@ func (c *UpdateGivenController) Post() {
 	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/octect-stream")
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
-
-	c.TplName = "list.html"
-	_ = c.Render()
 }
+
+func (c *QueryLatestPathController) Post(){
+	device := c.GetString("device")
+	o := orm.NewOrm()
+	fileMeta := models.File{Device: device}
+
+	err := o.QueryTable("file").Filter("device", device).OrderBy("-created").One(&fileMeta)
+	if err != nil {
+		return
+	}
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		fmt.Printf("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		fmt.Printf("Not row found")
+	}
+
+	f, err := os.Open(fileMeta.File_addr)
+
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+	defer f.Close()
+
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	//map[string]string
+
+	c.Ctx.ResponseWriter.Write([]byte(static_server+fileMeta.File_name))
+}
+

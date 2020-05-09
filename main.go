@@ -15,7 +15,7 @@ type User struct {
 
 func init() {
 	// set default database
-	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(192.168.1.95:3306)/updater_db?charset=utf8&loc=Asia%2FShanghai", 30)
+	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1:3306)/updater_db?charset=utf8&loc=Asia%2FShanghai", 30)
 
 	// register model
 	orm.RegisterModel(new(models.File))
@@ -24,6 +24,7 @@ func init() {
 
 	// create table
 	orm.RunSyncdb("default", false, true)
+	beego.SetStaticPath("/storage","F:\\Storage")
 }
 
 func main() {
