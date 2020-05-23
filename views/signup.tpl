@@ -93,7 +93,7 @@
             },
             success: function (data) {
                 console.log(data)
-                if (data == 'SUCCESS') {
+                if (data.code == '200') {
                     // 成功后跳到登录页
                     document.getElementById("login_hint").style.display = "block";
                     setTimeout(() => {

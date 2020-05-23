@@ -23,7 +23,7 @@ func init() {
 	orm.RegisterModel(new(models.UserToken))
 
 	// create table
-	orm.RunSyncdb("default", false, true)
+	orm.RunSyncdb("default", true, true)
 	beego.SetStaticPath("/storage","F:\\Storage")
 }
 

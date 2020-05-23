@@ -102,7 +102,7 @@ func (c *UploadController) Post() {
 	_ = c.Render()
 }
 
-func (c *DownloadController) Post() {
+func (c *DownloadController) Get() {
 	fsha1 := c.GetString("filehash")
 
 	o := orm.NewOrm()
@@ -134,8 +134,8 @@ func (c *DownloadController) Post() {
 	c.Ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment;filename=\""+fileMeta.File_name+"\"")
 	c.Ctx.ResponseWriter.Write(data)
 
-	c.TplName = "list.html"
-	_ = c.Render()
+	//c.TplName = "list.html"
+	//_ = c.Render()
 }
 
 func (c *ListController) Get() {

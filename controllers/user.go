@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Updater/common"
 	"Updater/models"
 	"Updater/util"
 	"fmt"
@@ -25,38 +26,59 @@ type UserSignInController struct {
 
 func (c *UserSignUpController) Get() {
 	c.TplName = "signup.tpl"
-	_ = c.Render()
 }
 
 func (c *UserSignUpController) Post() {
 	username := c.GetString("username")
 	userpwd := c.GetString("password")
 
+	fmt.Println(username, userpwd)
+
 	if len(username) < 3 || len(userpwd) < 5 {
-		c.Ctx.ResponseWriter.Write([]byte("Invalid parameter"))
-		return
+		ret := common.RetData{
+			Code: 400,
+			Msg:  "Username is too short",
+			Data: nil,
+		}
+		c.Data["json"] = &ret
+		c.ServeJSON()
+
+
 	}
 
 	encPasswd := util.Sha1([]byte(userpwd + pwdSalt))
+	fmt.Println(encPasswd)
 
 	user := models.User{
 		UserName: username,
 		UserPwd:  encPasswd,
 	}
 
+	fmt.Println(user)
+
 	o := orm.NewOrm()
-	id, err := o.Insert(&user)
+	_, err := o.Insert(&user)
 	if err != nil {
-		fmt.Println(213)
-		fmt.Println(id, err.Error())
-		c.Ctx.ResponseWriter.Write([]byte("FAILED"))
+		ret := common.RetData{
+			Code: 300,
+			Msg:  "DB error",
+			Data: user.UserName,
+		}
+		c.Data["json"] = &ret
+		c.ServeJSON()
+	}else{
+		ret := common.RetData{
+			Code: 200,
+			Msg:  "Register succeeded",
+			Data: user.UserName,
+		}
+		c.Data["json"] = &ret
+		c.ServeJSON()
 	}
-	c.Ctx.ResponseWriter.Write([]byte("SUCCESS"))
 }
 
 func (c *UserSignInController) Get() {
 	c.TplName = "signin.html"
-	_ = c.Render()
 }
 
 func (c *UserSignInController) Post() {
